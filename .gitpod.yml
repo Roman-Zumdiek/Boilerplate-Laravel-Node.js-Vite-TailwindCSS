@@ -1,6 +1,12 @@
+image: gitpod/workspace-mysql
 tasks:
-  - init: npm install
-    command: npm start
+  - init: |
+      sudo service mysql start
+      mysql -u root -e "CREATE DATABASE IF NOT EXISTS job_board"
+      cp .env.example .env
+      composer install
+      php artisan key:generate
+  - command: php artisan migrate --seed && php artisan serve --host=0.0.0.0 --port=8000
 ports:
-  - port: 3000
+  - port: 8000
     onOpen: open-preview
