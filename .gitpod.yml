@@ -2,8 +2,14 @@ image: gitpod/workspace-mysql
 tasks:
   - init: |
       sudo service mysql start
+      until mysqladmin ping --silent; do
+        sleep 1
+      done
       mysql -u root -e "CREATE DATABASE IF NOT EXISTS job_board"
       cp .env.example .env
+      sed -i "s/DB_DATABASE=.*/DB_DATABASE=job_board/" .env
+      sed -i "s/DB_USERNAME=.*/DB_USERNAME=root/" .env
+      sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=/" .env
       composer install
       php artisan key:generate
   - command: php artisan migrate --seed && php artisan serve --host=0.0.0.0 --port=8000
